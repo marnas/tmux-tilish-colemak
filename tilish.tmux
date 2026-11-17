@@ -179,7 +179,7 @@ tmux $bind "${mod}E" \
 
 # Reload configuration with Alt + Shift + c.
 tmux $bind "${mod}C" \
-	source-file ~/.tmux.conf \\\;\
+	source-file -q ~/.tmux.conf "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" \\\;\
 	display "Reloaded config"
 # }}}
 
