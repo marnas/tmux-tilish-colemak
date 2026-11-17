@@ -51,17 +51,24 @@
 # }}}
 
 # Define core functionality {{{
+window_exists () {
+	# Format that is non-empty only if a window with index $1 exists. A plain
+	# `-t :N` target is not enough: when index N is free, tmux falls back to
+	# matching N as a window name prefix (":3" selects a window named "3d").
+	printf '%s' "#{W:#{?#{==:#{window_index},$1},1,}}"
+}
+
 bind_switch () {
 	# Bind keys to switch between workspaces.
 	tmux $bind "$1" \
-		if-shell "tmux select-window -t :$2" "" "new-window -t :$2"
+		if-shell -F "$(window_exists "$2")" "select-window -t :$2" "new-window -t :$2"
 }
 
 bind_move () {
 	# Bind keys to move panes between workspaces.
 	tmux $bind "$1" \
-		if-shell "tmux join-pane -t :$2" \
-			"" \
+		if-shell -F "$(window_exists "$2")" \
+			"join-pane -t :$2" \
 			"new-window -dt :$2; join-pane -t :$2; select-pane -t top-left; kill-pane" \\\;\
 		select-layout \\\;\
 		select-layout -E
